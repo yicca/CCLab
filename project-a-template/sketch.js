@@ -16,7 +16,6 @@ let beCyan = false;
 let beBlue = false;
 let beViolet = false;
 let bePink = false;
-//changess
 
 function setup() {
     //let canvas = createCanvas(800, 500);
