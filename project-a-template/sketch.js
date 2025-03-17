@@ -6,8 +6,8 @@ let angle;
 let isOutOfControl = false;
 
 function setup() {
-    //let canvas = createCanvas(800, 500);
-    //canvas.parent("p5-canvas-container");
+    let canvas = createCanvas(800, 500);
+    canvas.parent("p5-canvas-container");
 
     createCanvas(800, 500);
     background(40);
