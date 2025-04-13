@@ -61,7 +61,7 @@ function drawClock(x, y) {
 
   for (i = 0; i < 360; i += 2) {
     noStroke();
-    fill(255, 215, 0, alp);
+    fill(30, 170, 225, alp);
     circle(cos(i) * 100, sin(i) * 100, 10);
   }
   pop();
