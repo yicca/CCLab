@@ -145,15 +145,15 @@ class Sailor {
     display() {
         push();
         translate(this.x, this.y);
-        for (let r = 60; r >= 20; r -= 5) {
+        for (let r = 60; r >= 20; r -= 2) {
             noStroke();
             fill(255, 255, 255, map(r, 60, 20, 10, 100));
             circle(0, 0, r);
         }
 
-        fill(255, 255, 255);
-        noStroke();
-        circle(0, 0, 20);
+        // fill(255, 255, 255);
+        // noStroke();
+        // circle(0, 0, 20);
 
         pop();
     }
@@ -348,7 +348,7 @@ class IslandParticles {
 
         push();
         translate(this.x, this.y);
-        for (let r = this.rad; r >= 20; r -= 5) {
+        for (let r = this.rad; r >= 20; r -= 2) {
             noStroke();
             fill(this.r, this.g, this.b, this.alphaParticle);
             circle(0, 0, r);
@@ -580,9 +580,10 @@ function mousePressed() {
     }
 
     //see the drift bottle
-    //if(sailing == true && dreamy == true){
-    //   (width / 2 + 30, 330)
-    // }
+    let dMB = dist(mouseX, mouseY, width / 2 + 30, 330);
+    if (sailing == true && dreamy == true && dMB <= 30) {
+        rect(350, 200, 100, 100)
+    }
 }
 
 function mouseReleased() {
