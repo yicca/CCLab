@@ -525,7 +525,7 @@ function drawDriftBottle() {
 function mousePressed() {
     //go to landing
     let d = dist(mouseX, mouseY, width / 2 + 150, 230);
-    if (sailing == true && fogArrive == true && d < 150) {
+    if (sailing == true && d < 150) {
         sailor.changePosition(width / 2, height / 2);
 
         landing = true;
