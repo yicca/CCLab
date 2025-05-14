@@ -8,6 +8,9 @@ let draggingIslandParticle = null;
 
 let worldWidth = 1000;
 let worldHeight = 1000;
+
+let worldRadius = 490; // ***
+
 let worldOffsetX = 0;
 let worldOffsetY = 0;
 
@@ -30,32 +33,24 @@ let surreal = false;
 let ending = false;
 let restart = false;
 
-let video;
-let bodyPose;
-let poses = [];
+let font;
 
 function preload() {
-    // load the bodyPose model
-    //bodyPose = ml5.bodyPose();
-    peacefulBackground = loadImage("assets/peaceful.png");
-    dreamyBackground = loadImage("assets/dreamy.png");
-    darkBackground = loadImage("assets/dark.png");
+    peacefulBgImg = loadImage("assets/peaceful.png");
+    dreamyBgImg = loadImage("assets/dreamy.png");
+    darkBgImg = loadImage("assets/dark.png");
+    surrealBgImg = loadImage("assets/surreal.png")
+
+    font = loadFont("assets/Recoleta-RegularDEMO.otf");
+    fontOfLetter = loadFont("assets/Duck & Tiger.otf");
 }
 
 function setup() {
     let canvas = createCanvas(800, 500);
     canvas.parent("p5-canvas-container");
 
-    // create the video and hide it
-    // video = createCapture(VIDEO);
-    // video.size(400, 400);
-    // video.hide();
-
-    // start detecting poses in the webcam video
-    //bodyPose.detectStart(video, gotPoses);
-
     angleMode(DEGREES);
-    textFont("Recoleta");
+    textFont(font);
 
     // sailor = new Sailor(10, 240);
     driftBottle = new DriftBottle(100, 330)
@@ -70,7 +65,10 @@ function draw() {
     if (landing) {
         drawIsland();
     }
+}
 
+function mouseReleased() {
+    draggingIslandParticle = null; // reset dragging button
 }
 
 class WaveParticles {
@@ -79,8 +77,10 @@ class WaveParticles {
         this.y = y;
         this.xSpeed = 0.5;
         this.noiseOffset = random(1, 2);
+
+        this.centerHeight = 250;
+        this.amp = 30; // 14 // sine
         this.noiseAmp = 150;
-        this.amp = 14;
     }
 
     update() {
@@ -94,8 +94,8 @@ class WaveParticles {
         }
 
         this.y =
-            250 +
-            this.amp * sin(this.x * 1.1 + frameCount * 0.02) +
+            this.centerHeight +
+            this.amp * sin(this.x * 1.1 + frameCount * 2) +
             noise(this.x * 0.003 + frameCount * 0.01 + this.noiseOffset) * this.noiseAmp;
     }
 
@@ -183,12 +183,8 @@ class Sailor {
     //go back to sailing
     backToSailing() {
         if (landing) {
-            if (
-                this.x <= 0 ||
-                this.x >= worldWidth ||
-                this.y <= 0 ||
-                this.y >= worldHeight
-            ) {
+            let distance = dist(this.x, this.y, worldWidth / 2, worldHeight / 2);
+            if (distance > worldRadius) {
                 landing = false;
                 sailing = true;
 
@@ -330,7 +326,9 @@ class IslandParticles {
     constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.rad = 15;
+        this.rad = 10;
+        this.radMax = random(10, 40);
+
         this.r = 255;
         this.g = 255;
         this.b = 255;
@@ -338,15 +336,39 @@ class IslandParticles {
         this.yV = random(-0.2, 0.2);
 
         if (peaceful === true) {
-            this.emoji = random(["A sip of sunlit coconut sweetness", "The soft sand beneath my feet ", "Sunlight", "Palm trees in the breeze", "Afterglow", "Starry Night", "Clear Blue Sea", ""]);
+            this.emoji = random(["A sip of sunlit coconut sweetness",
+                "The soft sand beneath my feet ",
+                "Sunlight",
+                "Palm trees in the breeze",
+                "Afterglow",
+                "Starry Night",
+                "Clear Blue Sea"]);
         } else if (dreamy === true) {
-            this.emoji = random(["The teddy bear on my bed", "The gift I received on my 6-year-old birthday", "My friends", "What will my future be like?", "A pure and carefree happiness", "I still remember that day...", "I missed my home."]);
+            this.emoji = random(["The teddy bear on my bed",
+                "The gift I received on my 6-year-old birthday",
+                "My friends",
+                "What will my future be like?",
+                "A pure and carefree happiness",
+                "I still remember that day...",
+                "I missed my home.",
+                "Summer breeze and popsicles",
+                "A sweater knitted by grandma "]);
         } else if (dark === true) {
-            this.emoji = random(["The roaring waves", "My soaking wet hair and drenched clothes", "I don't wanna die...", "The howling wind", "A black, churning sky", "I'm so scared.", "Did the darkness swallow my soul?"]);
+            this.emoji = random(["The roaring waves",
+                "My soaking wet hair and drenched clothes",
+                "I don't wanna die...",
+                "The howling wind",
+                "A black, churning sky",
+                "I'm so scared.",
+                "Did the darkness swallow my soul?"]);
         } else if (surreal === true) {
-            this.emoji = random(["👁️", "👃🏻", "👂🏻", "🫀", "👄", "🖐🏻", "👣"])
-            // draw the webcam video
-            //image(video, 0, 0);
+            this.emoji = random(["You’ve been here before, haven’t you?",
+                "Something you lost without knowing.",
+                "It happened in a dream you can’t quite recall.",
+                "2019",
+                "The scent of rain on summer grassfield.",
+                "The house you once lived",
+                "Deja vu"])
         }
 
         this.alphaParticle = map(this.rad, this.rad, this.rad * 0.3, 30, 120);
@@ -361,7 +383,7 @@ class IslandParticles {
 
             if (draggingIslandParticle === this) {
                 this.alphaParticle = 0;
-                textSize(14);
+                textSize(18);
                 textAlign(CENTER);
                 fill(this.r, this.g, this.b);
                 text(this.emoji, this.x, this.y);
@@ -380,7 +402,7 @@ class IslandParticles {
     }
 
     scale() {
-        if (this.rad <= 40) {
+        if (this.rad <= this.radMax) {
             this.rad = this.rad * 1.01;
         }
     }
@@ -400,9 +422,9 @@ class IslandParticles {
             this.g = 232;
             this.b = 236;
         } else if (dark === true) {
-            this.r = 210;
-            this.g = 210;
-            this.b = 210;
+            this.r = 220;
+            this.g = 220;
+            this.b = 220;
         } else if (surreal === true) {
             this.r = 255;
             this.g = 255;
@@ -421,28 +443,21 @@ class IslandParticles {
     }
 }
 
-function drawIslandSky(c1, c2) {
-    let bg = color(200, 225, 250);
+function drawIslandSky(theme) {
+    imageMode(CENTER);
 
-    for (let y = 101; y < worldHeight - 100; y++) {
-        let inter = map(y, 101, worldHeight - 101, 0, 1);
-        let c = lerpColor(c1, c2, inter);
-        stroke(c);
-        line(0, y, worldWidth, y);
-    }
-
-    for (let i = 0; i <= 100; i++) {
-        let inter = map(i, 0, 100, 0, 1);
-        let c = lerpColor(bg, c1, inter);
-        stroke(c);
-        line(0, i, worldWidth, i);
-    }
-
-    for (let i = 100; i >= 0; i--) {
-        let inter = map(i, 100, 0, 0, 1);
-        let c = lerpColor(c2, bg, inter);
-        stroke(c);
-        line(0, worldHeight - i, worldWidth, worldHeight - i);
+    if (theme === "peaceful") {
+        fill(0, 0, 255, 150);
+        image(peacefulBgImg, worldWidth / 2, worldHeight / 2);
+    } else if (theme === "dreamy") {
+        fill(255, 0, 255, 150);
+        image(dreamyBgImg, worldWidth / 2, worldHeight / 2);
+    } else if (theme === "dark") {
+        fill(100, 150);
+        image(darkBgImg, worldWidth / 2, worldHeight / 2);
+    } else if (theme === "surreal") {
+        fill(255, 255, 0, 150);
+        image(surrealBgImg, worldWidth / 2, worldHeight / 2);
     }
 }
 
@@ -457,25 +472,17 @@ function drawIsland() {
     translate(worldOffsetX, worldOffsetY);
 
     if (peaceful === true) {
-        let c1 = color("rgb(196,205,255)");
-        let c2 = color("rgb(222,255,215)");
-        drawIslandSky(c1, c2);
+        drawIslandSky("peaceful");
     } else if (dreamy === true) {
-        let c1 = color("rgb(255,232,236)");
-        let c2 = color("rgb(255,251,205)");
-        drawIslandSky(c1, c2);
+        drawIslandSky("dreamy");
     } else if (dark === true) {
-        let c1 = color("rgb(86,127,188)");
-        let c2 = color("rgb(0,33,91)");
-        drawIslandSky(c1, c2);
+        drawIslandSky("dark");
     } else if (surreal === true) {
-        let c1 = color("rgb(243,243,243)");
-        let c2 = color("rgb(97,97,97)");
-        drawIslandSky(c1, c2);
+        drawIslandSky("surreal");
     }
 
     //draw island particles
-    if (landing && !islandParticlesInitialized) {
+    if (landing == true && !islandParticlesInitialized) {
         for (let i = 0; i < 50; i++) {
             islandParticles.push(
                 new IslandParticles(random(worldWidth), random(worldHeight))
@@ -630,12 +637,13 @@ function drawDriftBottle() {
         driftBottle.display();
         driftBottle.move();
         if (showLetter) {
+            push();
+
             noStroke();
             fill("rgb(255, 230, 147)")
             rectMode(CENTER);
             rect(width / 2, height / 2, 300, 220, 20)
 
-            push();
             textSize(38);
             textFont("Duck & Tiger");
             textAlign(CENTER);
@@ -647,6 +655,7 @@ function drawDriftBottle() {
             fill(80);
             textAlign(CENTER);
             text("Click on the drift bottle to put it back.", width / 2, height / 2 + 90);
+
             pop();
         }
     }
@@ -666,7 +675,7 @@ function mousePressed() {
     //go to landing
     let d = dist(mouseX, mouseY, width / 2 + 150, 230);
     if (sailing == true && showLetter == false && d < 200) {
-        sailor.changePosition(width / 2, height / 2);
+        sailor.changePosition(worldWidth / 2, worldHeight / 2);
 
         landing = true;
         sailing = false;
@@ -704,23 +713,23 @@ function mousePressed() {
     }
 }
 
-function mouseReleased() {
-    draggingIslandParticle = null; // reset dragging button
-}
-
 function switchMode() {
     if (peaceful) {
         peaceful = false;
         dreamy = true;
+        fogArrive = false;
     } else if (dreamy) {
         dreamy = false;
         dark = true;
+        fogArrive = false;
     } else if (dark) {
         dark = false;
         surreal = true;
+        fogArrive = false;
     } else if (surreal) {
         surreal = false;
         ending = true;
+        fogArrive = false;
     }
 }
 
@@ -742,32 +751,3 @@ function drawEnding() {
         text("Click to restart", width / 2, height - 50)
     }
 }
-
-// function drawVideo() {
-//     // draw the webcam video
-//     image(video, 0, 0);
-
-//     // draw all the tracked landmark points
-//     for (let i = 0; i < poses.length; i++) {
-//         let pose = poses[i];
-//         for (let j = 0; j < pose.keypoints.length; j++) {
-//             let keypoint = pose.keypoints[j];
-//             // only draw if confidence is high enough
-//             if (keypoint.score > 0.1) {
-//                 fill(0, 255, 0);
-//                 noStroke();
-//                 circle(keypoint.x, keypoint.y, 5);
-
-//                 // display bodypart name and score
-//                 text(keypoint.name, keypoint.x + 10, keypoint.y);
-//                 text(keypoint.score.toFixed(2), keypoint.x + 10, keypoint.y + 20);
-//             }
-//         }
-//     }
-// }
-
-// // callback function for when bodyPose outputs data
-// function gotPoses(results) {
-//     // save the output to the poses variable
-//     poses = results;
-// }

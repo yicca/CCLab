@@ -8,10 +8,18 @@ canvas {
   display: block;
 }
 
+@font-face {
+  font-family: 'Recoleta';
+  src: url('assets/Recoleta-RegularDEMO.otf') format('opentype');
+}
+
 .main-wrapper {
   max-width: 800px;
   margin: 0 auto;
   padding: 50px 0;
 
   text-align: center;
+  color: rgb(200, 225, 250);
+  font-family: 'Recoleta', Playfair Display;
+  ;
 }
