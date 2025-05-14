@@ -340,7 +340,7 @@ class IslandParticles {
         if (peaceful === true) {
             this.emoji = random(["A sip of sunlit coconut sweetness", "The soft sand beneath my feet ", "Sunlight", "Palm trees in the breeze", "Afterglow", "Starry Night", "Clear Blue Sea", ""]);
         } else if (dreamy === true) {
-            this.emoji = random(["The teddy bear on my bed", "The gift I received on my 6-year-old birthday", "My friend", "What will my future be like?", "A pure and carefree happiness", "I still remember that day...", "I missed my home."]);
+            this.emoji = random(["The teddy bear on my bed", "The gift I received on my 6-year-old birthday", "My friends", "What will my future be like?", "A pure and carefree happiness", "I still remember that day...", "I missed my home."]);
         } else if (dark === true) {
             this.emoji = random(["The roaring waves", "My soaking wet hair and drenched clothes", "I don't wanna die...", "The howling wind", "A black, churning sky", "I'm so scared.", "Did the darkness swallow my soul?"]);
         } else if (surreal === true) {
@@ -351,6 +351,7 @@ class IslandParticles {
 
         this.alphaParticle = map(this.rad, this.rad, this.rad * 0.3, 30, 120);
     }
+
     checkMouse() {
         let worldMouseX = mouseX - worldOffsetX;
         let worldMouseY = mouseY - worldOffsetY;
@@ -652,6 +653,16 @@ function drawDriftBottle() {
 }
 
 function mousePressed() {
+    //dragging island particles
+    for (let i = islandParticles.length - 1; i >= 0; i--) {
+        let isP = islandParticles[i];
+        if (isP.checkMouse()) {
+            // if true, this button is "draggingButton"!
+            draggingIslandParticle = isP;
+            break; // stop checking other buttons as we already found the one
+        }
+    }
+
     //go to landing
     let d = dist(mouseX, mouseY, width / 2 + 150, 230);
     if (sailing == true && showLetter == false && d < 200) {
@@ -661,16 +672,6 @@ function mousePressed() {
         sailing = false;
 
         fogArrive = false;
-    }
-
-    //dragging island particles
-    for (let i = islandParticles.length - 1; i >= 0; i--) {
-        let isP = islandParticles[i];
-        if (isP.checkMouse()) {
-            // if true, this button is "draggingButton"!
-            draggingIslandParticle = isP;
-            break; // stop checking other buttons as we already found the one
-        }
     }
 
     //see the drift bottle
@@ -735,7 +736,7 @@ function drawEnding() {
         text("So do your memories.", width / 2, height / 2);
         text("So do you.", width / 2, height / 2 + 40);
 
-        let alphaText = sin(frameCount * 5) * 100 + 120
+        let alphaText = sin(frameCount * 3) * 80 + 120
         fill(255, 255, 255, alphaText)
         textSize(12);
         text("Click to restart", width / 2, height - 50)
