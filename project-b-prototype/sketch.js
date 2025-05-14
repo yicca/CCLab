@@ -18,6 +18,7 @@ let fogArrive = false;
 let landing = false;
 let stormInitialized = false;
 let islandParticlesInitialized = false;
+let showLetter = false;
 
 let peaceful = false;
 let dark = false;
@@ -46,9 +47,10 @@ function setup() {
     //bodyPose.detectStart(video, gotPoses);
 
     angleMode(DEGREES);
+    textFont("Recoleta");
 
-    sailor = new Sailor(10, 260);
-    driftBottle = new DriftBottle(width / 2 + 30, 330)
+    sailor = new Sailor(10, 240);
+    driftBottle = new DriftBottle(100, 330)
 
     peaceful = true;
 }
@@ -108,7 +110,11 @@ class Sailor {
     move() {
         this.x += this.xSpeed;
         this.x = constrain(this.x, 50, width / 2);
-        this.y = 260 + sin(frameCount * 2) * 10 + noise(this.fluc * 0.08) * 50;
+        if (dark) {
+            this.y = 260 + sin(frameCount * 2) * 30 + noise(this.fluc * 0.08) * 90;
+        } else {
+            this.y = 260 + sin(frameCount * 2) * 10 + noise(this.fluc * 0.08) * 50;
+        }
     }
 
     moveByKey() {
@@ -150,11 +156,6 @@ class Sailor {
             fill(255, 255, 255, map(r, 60, 20, 10, 100));
             circle(0, 0, r);
         }
-
-        // fill(255, 255, 255);
-        // noStroke();
-        // circle(0, 0, 20);
-
         pop();
     }
 
@@ -174,14 +175,14 @@ class StormParticles {
         push();
         translate(this.x, this.y);
         strokeWeight(1);
-        stroke("rgba(0,180,255,0.66)");
+        stroke("rgba(0, 179, 255, 0.47)");
         line(0, 0, 10, -20);
         pop();
     }
 
     update() {
-        this.x -= 2;
-        this.y += 4;
+        this.x -= 3;
+        this.y += 6;
 
         if (this.y > height) {
             this.y = random(-5, 5);
@@ -244,7 +245,7 @@ class DriftBottle {
     constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.angle = 0
+        //this.angle = 0
     }
 
     display() {
@@ -273,14 +274,13 @@ class DriftBottle {
     move() {
         this.y = 330 + sin(frameCount * 2) * 5
     }
-
 }
 
 class IslandParticles {
     constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.rad = 60;
+        this.rad = 40;
         this.r = 255;
         this.g = 255;
         this.b = 255;
@@ -306,12 +306,12 @@ class IslandParticles {
         let worldMouseY = mouseY - worldOffsetY;
         let distance = dist(this.x, this.y, worldMouseX, worldMouseY);
         if (distance < this.rad * 0.5) {
-            this.alphaParticle = map(this.rad, this.rad, 20, 50, 200);
+            this.alphaParticle = map(this.rad, this.rad, 20, 60, 200);
 
             if (draggingIslandParticle === this) {
                 this.alphaParticle = 0;
                 textSize(32);
-                textAlign(CENTER, CENTER);
+                textAlign(CENTER);
                 fill(this.r, this.g, this.b);
                 text(this.emoji, this.x, this.y);
             }
@@ -482,20 +482,38 @@ function drawSailing() {
             f.display();
         }
 
-        if (dark) {
-            drawStorming();
+        if (peaceful && fogArrive == true) {
+            noStroke();
+            fill(80);
+            textSize(18);
+            text("It seems you've arrived at a mysterious island.", 60, 100);
+            text("Click on the fog land and explore!", 60, 130);
         }
 
         if (dreamy) {
             drawDriftBottle();
+            noStroke();
+            fill(80);
+            textSize(18);
+            text("Here's a drift bottle.", 60, 100);
+            text("Click to see what's inside.", 60, 130);
+        }
+
+        if (dark) {
+            drawStorming();
+            noStroke();
+            fill(80);
+            textSize(18);
+            text("Oh no! There's a storm!", 60, 100);
+            text("You almost lost your life in this storm...", 60, 130);
         }
     }
 }
 
 function drawStorming() {
     if (dark && !stormInitialized) {
-        for (let i = 0; i < 200; i++) {
-            let startX = random(-50, width);
+        for (let i = 0; i < 600; i++) {
+            let startX = random(-50, width + 200);
             let startY = random(0, height);
             stormParticles.push(new StormParticles(startX, startY));
         }
@@ -519,13 +537,33 @@ function drawDriftBottle() {
     if (sailing == true && dreamy == true) {
         driftBottle.display();
         driftBottle.move();
+        if (showLetter) {
+            noStroke();
+            fill("rgb(255, 230, 147)")
+            rectMode(CENTER);
+            rect(width / 2, height / 2, 300, 220, 20)
+
+            push();
+            textSize(38);
+            textFont("Duck & Tiger");
+            textAlign(CENTER);
+            fill(20);
+            text("Something from the past...", width / 2, height / 2);
+
+            textSize(14);
+            textFont("Recoleta");
+            fill(80);
+            textAlign(CENTER);
+            text("Click on the drift bottle to put it back.", width / 2, height / 2 + 90);
+            pop();
+        }
     }
 }
 
 function mousePressed() {
     //go to landing
     let d = dist(mouseX, mouseY, width / 2 + 150, 230);
-    if (sailing == true && d < 150) {
+    if (sailing == true && showLetter == false && d < 200) {
         sailor.changePosition(width / 2, height / 2);
 
         landing = true;
@@ -580,9 +618,9 @@ function mousePressed() {
     }
 
     //see the drift bottle
-    let dMB = dist(mouseX, mouseY, width / 2 + 30, 330);
-    if (sailing == true && dreamy == true && dMB <= 30) {
-        rect(350, 200, 100, 100)
+    let dMB = dist(mouseX, mouseY, 100, 330);
+    if (sailing == true && dreamy == true && dMB <= 50) {
+        showLetter = !showLetter;
     }
 }
 

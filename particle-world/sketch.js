@@ -11,7 +11,7 @@ function setup() {
   canvas.parent("p5-canvas-container");
 
   // generate particles
-  for (let i = 0; i <= 0; i++) {
+  for (let i = 0; i < 0; i++) {
     let angle = random(180, 360);
     let startX = cos(angle) * 98 + 396;
     let startY = sin(angle) * 98 + 205;
@@ -22,7 +22,7 @@ function setup() {
 }
 
 function draw() {
-  background(40);
+  background(220);
 
   let angle = random(0, 180);
   let startX = cos(angle) * 98 + 396;
@@ -52,18 +52,26 @@ function drawClock(x, y) {
 
   let alp = map(sin(frameCount), -1, 1, 20, 220);
 
-  stroke(200, alp);
-  strokeWeight(2);
+  // bg
+  strokeWeight(10);
+  stroke(0);
+  fill(255);
+  circle(0, 0, 200);
+
+  // hand(s)
   let xHand = cos(sec) * 70;
   let yHand = sin(sec) * 70;
+  strokeWeight(3);
+  stroke(0, alp);
   line(0, 0, xHand, yHand);
   sec++;
 
-  for (i = 0; i < 360; i += 2) {
+  for (i = 0; i < 360; i += 30) {
     noStroke();
-    fill(30, 170, 225, alp);
-    circle(cos(i) * 100, sin(i) * 100, 10);
+    fill(0, alp);
+    circle(cos(i + frameCount * -0.3) * 120, sin(i + frameCount * -0.3) * 120, 3);
   }
+
   pop();
 }
 
@@ -73,7 +81,6 @@ class Particle {
     // properties (variables): particle's characteristics
     this.x = x;
     this.y = y;
-    this.dia = 30;
     this.acc = 0.002;
 
     this.ySpeed = 1;
@@ -94,7 +101,7 @@ class Particle {
     let alpha = map(this.y, 250, 500, 255, 0);
 
     noStroke();
-    fill(255, alpha);
+    fill(0, alpha);
     textFont('Courier New')
     text(this.time, 0, 0);
 
