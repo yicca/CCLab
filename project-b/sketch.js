@@ -735,8 +735,9 @@ function drawEnding() {
         text("So do your memories.", width / 2, height / 2);
         text("So do you.", width / 2, height / 2 + 40);
 
-        let alphaText = sin(frameCount * 5) * 100 + 180
+        let alphaText = sin(frameCount * 5) * 100 + 120
         fill(255, 255, 255, alphaText)
+        textSize(12);
         text("Click to restart", width / 2, height - 50)
     }
 }
