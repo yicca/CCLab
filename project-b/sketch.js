@@ -362,12 +362,12 @@ class IslandParticles {
                 "I'm so scared.",
                 "Did the darkness swallow my soul?"]);
         } else if (surreal === true) {
-            this.emoji = random(["You’ve been here before, haven’t you?",
-                "Something you lost without knowing.",
-                "It happened in a dream you can’t quite recall.",
+            this.emoji = random(["I’ve been here before...",
+                "Something I lost without knowing",
+                "It happened in a dream I can’t quite recall.",
                 "2019",
                 "The scent of rain on summer grassfield.",
-                "The house you once lived",
+                "The house I once lived",
                 "Deja vu"])
         }
 
