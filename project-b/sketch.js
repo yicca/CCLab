@@ -335,6 +335,8 @@ class IslandParticles {
         this.xV = random(-0.2, 0.2);
         this.yV = random(-0.2, 0.2);
 
+        push();
+        textFont(font);
         if (peaceful === true) {
             this.emoji = random(["A sip of sunlit coconut sweetness",
                 "The soft sand beneath my feet ",
@@ -370,6 +372,7 @@ class IslandParticles {
                 "The house I once lived",
                 "Deja vu"])
         }
+        pop()
 
         this.alphaParticle = map(this.rad, this.rad, this.rad * 0.3, 30, 120);
     }
@@ -571,6 +574,9 @@ function drawSailing() {
             f.display();
         }
 
+        push();
+        textFont(font);
+
         if (peaceful && fogArrive == true) {
             noStroke();
             fill(80);
@@ -606,6 +612,7 @@ function drawSailing() {
             waitingToRestart = true;
             sailing = false;
         }
+        pop();
     }
 }
 
@@ -645,13 +652,13 @@ function drawDriftBottle() {
             rect(width / 2, height / 2, 300, 220, 20)
 
             textSize(38);
-            textFont("Duck & Tiger");
+            textFont(fontOfLetter);
             textAlign(CENTER);
             fill(20);
             text("Something from the past...", width / 2, height / 2);
 
             textSize(14);
-            textFont("Recoleta");
+            textFont(font);
             fill(80);
             textAlign(CENTER);
             text("Click on the drift bottle to put it back.", width / 2, height / 2 + 90);
